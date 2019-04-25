@@ -27,6 +27,7 @@
         "vue": "^2.5.17"
     },
     "dependencies": {
+        "zip-a-folder": "0.0.7",
         "zip-folder": "^1.0.0"
     }
 }

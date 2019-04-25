@@ -2,7 +2,8 @@ var FtpDeploy = require('ftp-deploy');
 var ftpDeploy = new FtpDeploy();
 var dotenv = require('dotenv');
 var request = require('request');
-var zipFolder = require('zip-folder');
+var zipAFolder = require('zip-a-folder');
+var fs = require('fs');
 
 // require('nightwatch/bin/runner.js');
 
@@ -18,9 +19,13 @@ var config = {
     host: process.env.FTP_HOST,
     port: process.env.FTP_PORT,
     localRoot: __dirname + process.env.FTP_LOCAL_ROOT,
-    deleteRemote: true,
+    // deleteRemote: true,
     forcePasv: true,
-    include: ['archive.zip', 'public/**']     // e.g. exclude sourcemaps - ** exclude: [] if nothing to exclude **
+    include: [
+        'release.zip',
+        'public/**',
+        '_extensions/**'
+    ]
 }
 
 switch(currentStage) {
@@ -33,27 +38,23 @@ switch(currentStage) {
 }
 
 // First we will zip the folder.
-zipFolder('./', './archive.zip', function(err) {
+zipAFolder.zipFolder('./', './release.zip', function(err) {
     if(err) {
         console.log('oh no!', err);
     } else {
         ftpDeploy.deploy(config)
         .then(res => {
             console.log('- Deployment complete using ' + currentStage.toUpperCase() + ' configuration stage at https://' + config.remoteRoot);
-            // request(process.env.APP_URL + '/install.php', function (error, response, body) {
-            //     if (!error && response.statusCode == 200) {
-            //         console.log(body)
-            //         }
-            //     });
+            request(process.env.APP_URL + '/install.php', function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    console.log(body);
+                    fs.unlink('./release.zip', (err) => {
+                        if (err) throw err;
+                        console.log('successfully deleted release zip');
+                    });
+                }
+            });
         })
         .catch(err => console.log(err));
     }
 });
-
-
-
-
-
-
-// use with promises
-
