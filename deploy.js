@@ -2,7 +2,7 @@ var FtpDeploy = require('ftp-deploy');
 var ftpDeploy = new FtpDeploy();
 var dotenv = require('dotenv');
 var request = require('request');
-var zipAFolder = require('zip-a-folder');
+var zip = require('bestzip');
 var fs = require('fs');
 
 // require('nightwatch/bin/runner.js');
@@ -30,18 +30,18 @@ var config = {
 
 switch(currentStage) {
     case 'staging':
-        config.remoteRoot = '/staging.api.devitup.co.uk/';
+        config.remoteRoot = '/staging.api.devitup.co.uk/current/';
     break;
     case 'production':
-        config.remoteRoot = '/api.devitup.co.uk/';
+        config.remoteRoot = '/api.devitup.co.uk/current/';
     break;
 }
 
 // First we will zip the folder.
-zipAFolder.zipFolder('./', './release.zip', function(err) {
-    if(err) {
-        console.log('oh no!', err);
-    } else {
+zip({
+    source: './',
+    destination: './release.zip'
+}).then(() => {
         ftpDeploy.deploy(config)
         .then(res => {
             console.log('- Deployment complete using ' + currentStage.toUpperCase() + ' configuration stage at https://' + config.remoteRoot);
@@ -56,5 +56,7 @@ zipAFolder.zipFolder('./', './release.zip', function(err) {
             });
         })
         .catch(err => console.log(err));
-    }
-});
+    }).catch(function(err) {
+        console.error(err.stack);
+        process.exit(1);
+    });
