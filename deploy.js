@@ -1,7 +1,7 @@
 var FtpDeploy = require('ftp-deploy');
 var ftpDeploy = new FtpDeploy();
 var dotenv = require('dotenv');
-var request = require('request');
+var request = require('request-promise');
 var zip = require('bestzip');
 var fs = require('fs');
 
@@ -37,22 +37,22 @@ switch(currentStage) {
     break;
 }
 
-// First we will zip the folder.
-zip({
-    source: './',
-    destination: './release.zip'
-}).then(() => {
+// First we will run the release.php script to zip up all of the existing code.
+request(process.env.APP_URL + '/release.php').finally(() => {
+    // Now we will zip the folder.
+    zip({
+        source: './',
+        destination: './release.zip'
+    }).then(() => {
         ftpDeploy.deploy(config)
         .then(res => {
             console.log('- Deployment complete using ' + currentStage.toUpperCase() + ' configuration stage at https://' + config.remoteRoot);
-            request(process.env.APP_URL + '/install.php', function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-                    console.log(body);
-                    fs.unlink('./release.zip', (err) => {
-                        if (err) throw err;
-                        console.log('successfully deleted release zip');
-                    });
-                }
+            request(process.env.APP_URL + '/install.php').then((body) => {
+                console.log(body);
+                fs.unlink('./release.zip', (err) => {
+                    if (err) throw err;
+                    console.log('successfully deleted release zip');
+                });
             });
         })
         .catch(err => console.log(err));
@@ -60,3 +60,6 @@ zip({
         console.error(err.stack);
         process.exit(1);
     });
+});
+
+

@@ -28,6 +28,7 @@
     },
     "dependencies": {
         "bestzip": "^2.1.2",
+        "request-promise": "^4.2.4",
         "zip-a-folder": "0.0.7",
         "zip-folder": "^1.0.0"
     }
