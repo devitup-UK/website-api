@@ -19,12 +19,19 @@ var config = {
     host: process.env.FTP_HOST,
     port: process.env.FTP_PORT,
     localRoot: __dirname + process.env.FTP_LOCAL_ROOT,
-    // deleteRemote: true,
     forcePasv: true,
     include: [
         'release.zip',
         'public/**',
         '_extensions/**'
+    ],
+    exclude: [
+        '.git/**/*',
+        '.git/',
+        '.git*',
+        '.editorconfig',
+        '.styleci.yml',
+        '.env'
     ]
 }
 
@@ -41,7 +48,7 @@ switch(currentStage) {
 request(process.env.APP_URL + '/release.php').finally(() => {
     // Now we will zip the folder.
     zip({
-        source: './',
+        source: './*',
         destination: './release.zip'
     }).then(() => {
         ftpDeploy.deploy(config)
