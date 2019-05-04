@@ -1,6 +1,6 @@
 <?php
 
-// Function to remove folders and files 
+// Function to remove folders and files
 function rrmdir($dir) {
     if (is_dir($dir)) {
         $files = scandir($dir);
@@ -11,7 +11,7 @@ function rrmdir($dir) {
     else if (file_exists($dir)) unlink($dir);
 }
 
-// Function to Copy folders and files       
+// Function to Copy folders and files
 function rcopy($src, $dst) {
     if (file_exists ( $dst ))
         rrmdir ( $dst );
