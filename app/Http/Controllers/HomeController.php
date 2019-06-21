@@ -15,11 +15,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+// use Illuminate\Http\Request;
+use App\Http\Requests\ContactFormSubmission;
 use Illuminate\Support\Facades\Mail;
 
 use App\Contact;
 use App\Mail\ContactRequestSubmitted;
+use Exception;
 
 /**
  * This file will describe all of the endpoints controlled by the HomeController.
@@ -40,19 +42,27 @@ class HomeController extends Controller
      *
      * @return void
      */
-    public function contact(Request $request)
+    public function contact(ContactFormSubmission $request)
     {
+        throw new Exception("Error Processing Request - Sentry Test", 1);
+
         $contact = new Contact($request->input('contact'));
         $contact->save();
 
         $mail = Mail::send(new ContactRequestSubmitted($contact));
 
-        dd($mail);
-
         if ($contact) {
-            return response(200);
+            return response()->json(
+                [
+                    'message' => 'Success'
+                ]
+            );
         } else {
-            return response(500);
+            return response()->json(
+                [
+                    'message' => 'Failure'
+                ]
+            );
         }
     }
 }

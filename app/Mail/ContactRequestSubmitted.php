@@ -57,16 +57,28 @@ class ContactRequestSubmitted extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        return $this->to(
-            [
-                'address'   => env('MAIL_ENQUIRIES_ADDRESS'),
-                'name'      => 'DevItUp Team'
-            ]
-        )->from(
-            [
-                'address' => $this->contact->email_address,
-                'name'  => $this->contact->getFullName()
-            ]
-        )->view('emails.contact.received', ['contact' => $this->contact->toArray()]);
+        // dd(
+        //     [
+        //         'address'   => env('MAIL_ENQUIRIES_ADDRESS'),
+        //         'name'      => 'DevItUp Team'
+        //     ],
+        //     [
+        //         'address'   => $this->contact->email,
+        //         'name'      => $this->contact->getFullName()
+        //     ]
+        // );
+
+        return $this->to(env('MAIL_ENQUIRIES_ADDRESS'))
+            ->from(
+                [
+                    'address'   => $this->contact->email,
+                    'name'      => $this->contact->getFullName()
+                ]
+            )->view(
+                'emails.contact.received',
+                [
+                    'contact' => $this->contact->toArray()
+                ]
+            );
     }
 }
