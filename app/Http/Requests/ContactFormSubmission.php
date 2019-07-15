@@ -48,10 +48,11 @@ class ContactFormSubmission extends FormRequest
         return [
             'contact'               => 'required|array',
             'contact.first_name'    => 'required|string',
-            'contact.last_name'     => 'required|string',
+            'contact.last_name'     => 'nullable|string',
             'contact.email'         => 'required|email',
             'contact.subject'       => 'required|string',
-            'contact.message'       => 'nullable|string'
+            'contact.message'       => 'nullable|string',
+            'password'              => 'required|string'
         ];
     }
 }

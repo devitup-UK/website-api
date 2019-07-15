@@ -44,25 +44,30 @@ class HomeController extends Controller
      */
     public function contact(ContactFormSubmission $request)
     {
-        throw new Exception("Error Processing Request - Sentry Test", 1);
+        $failureResponse = response()->json(
+            [
+                'message' => 'Failure'
+            ]
+        );
 
-        $contact = new Contact($request->input('contact'));
-        $contact->save();
-
-        $mail = Mail::send(new ContactRequestSubmitted($contact));
-
-        if ($contact) {
-            return response()->json(
-                [
-                    'message' => 'Success'
-                ]
-            );
-        } else {
-            return response()->json(
-                [
-                    'message' => 'Failure'
-                ]
-            );
+        if($request->input('password') == env('API_PASSWORD')) {
+            $contact = new Contact($request->input('contact'));
+            $contact->save();
+    
+            $mail = Mail::send(new ContactRequestSubmitted($contact));
+    
+            if ($contact) {
+                return response()->json(
+                    [
+                        'message' => 'Success'
+                    ]
+                );
+            } else {
+                return $failureResponse;
+            }
+        }else{
+            return $failureResponse;
         }
+        
     }
 }
